@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <!-- Pills navs -->
+    <div style="width: 350px;">
+        <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="tab-login" href="/login" role="tab"
+              aria-controls="pills-login" aria-selected="true">Login</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="tab-register" href="/register" role="tab"
+              aria-controls="pills-register" aria-selected="false">Register</a>
+          </li>
+        </ul>
+        <!-- Pills navs -->
+        
+        <!-- Pills content -->
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
+                <form id="login-form">
+                <!-- Email input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="loginName">Username</label>
+                    <input type="text" name="username" id="loginName" class="form-control" />
+                </div>
+            
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input type="password" name="password" id="loginPassword" class="form-control" />
+                </div>
+
+                <!-- Email input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="time">Thời gian giữ đăng nhập[đơn vị: giây(s)]</label>
+                    <input type="number" name="username" id="time" class="form-control" />
+                </div>
+            
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+            
+                <!-- Register buttons -->
+                <div class="text-center">
+                    <p>Not a member? <a href="/register">Register</a></p>
+                </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <p class="text-danger"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+      $(document).ready(function() {
+        const error = $('.text-danger')
+        error.text("")
+
+        $('#login-form').on('submit', function(e) { 
+            e.preventDefault();
+            const username = $('#loginName').val()         
+            const password = $('#loginPassword').val()
+            const time = $('#time').val()
+          
+            if(!username || !password || !time){
+                error.text("Please enter all fields")
+                return;
+            }
+
+            const user = {
+                username,
+                password,
+                time
+            }
+
+            $.post('http://localhost:3113/login', user).then(data => {
+                if(data.success){
+                    $(location).attr('href', 'http://localhost:20619/')
+                }
+                else{
+                    error.text(data.message)
+                    return;
+                }
+            })
+        });
+    });
+</script>

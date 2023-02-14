@@ -1,0 +1,61 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="alert alert-light d-flex justify-content-between align-items-center" role="alert">
+            <p class="name"><b>Hi</b> {{user.Username}}</p> <a href="http://localhost:3113/logout" class="btn btn-primary">Logout</a>
+        </div>
+    </div>
+
+    <div class="p-3">
+        <ul id="messages"></ul>
+        <form id="chat-form" class="d-flex gap-3">
+            <input type="text" id="chat-mes" class="form-control">
+            <button id="send-chat" class="btn btn-primary">gửi</button>
+        </form>
+        <form id="chat-img" class="d-flex align-items-center justify-content-between gap-3 mt-3">
+            <input type="file" id="img" onchange="setImgSrc(this)" accept="image/*" />
+            <button class="btn btn-primary" type="submit" id="send-img">gửi ảnh</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+</div>
+
+<script>
+    const socket = io();
+    const name = $('.name').text().split(' ')[1];
+    const formChat = $('#chat-form');
+    const chatMess = $('#chat-mes')
+    const formImg = $('#chat-img')
+    formChat.submit(function(e) {
+        e.preventDefault();
+        const message = chatMess.val();
+        socket.emit('on-chat', {name, message});
+        chatMess.val('')
+    })
+
+    var src
+    var setImgSrc = (elm) => {
+        var fr = new FileReader()
+        fr.onload = () => (src = fr.result)
+        fr.readAsArrayBuffer(elm.files[0])
+    }
+    formImg.submit(function(e){
+        e.preventDefault()
+        socket.emit('submitImg', {name, src})
+    })
+
+    const chats = $('#messages')
+    socket.on('user-chat', (message) => {
+        const chatItem = `<li><b>${message.name}: </b>${message.message}</li>`;
+        chats.append(chatItem);
+    })
+
+    socket.on('sentImg', (message) => {
+        src = (window.URL || window.webkitURL).createObjectURL(
+            new Blob([message.src], {
+                type: 'image/png'
+            })
+        )
+        const chatItem = `<li> <b>${message.name}: </b> <br> <img src=${src} style="width: 200px; height: 200px;"/></li>`
+        chats.append(chatItem)
+    })
+</script>

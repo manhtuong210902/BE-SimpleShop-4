@@ -1,0 +1,94 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <!-- Pills navs -->
+    <div style="width: 350px;">
+        <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="tab-login" href="/login" role="tab"
+              aria-controls="pills-login" aria-selected="true">Login</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="tab-register" href="/register" role="tab"
+              aria-controls="pills-register" aria-selected="false">Register</a>
+          </li>
+        </ul>
+        <!-- Pills navs -->
+        
+        <!-- Pills content -->
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
+                <form id="register-form"> 
+                <!-- Username input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="RegisterName">Username</label>
+                    <input type="text" id="RegisterName" name="username" class="form-control" />
+                </div>
+            
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="RegisterPassword">Password</label>
+                    <input type="password" id="RegisterPassword" name="password" class="form-control" />
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="RegisterFullName">FullName</label>
+                    <input type="text" id="RegisterFullName" name="username" class="form-control" />
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="RegisterAddress">Address</label>
+                    <input type="text" id="RegisterAddress" name="username" class="form-control" />
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary btn-block mb-4">Sign up</button>
+            
+                <!-- Register buttons -->
+                <div class="text-center">
+                    <p>You had a account? <a href="/login">Login</a></p>
+                </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <p class="text-danger"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        const error = $('.text-danger')
+        error.text("")
+
+        $('#register-form').on('submit', function(e) { 
+            e.preventDefault();
+            const username = $('#RegisterName').val()         
+            const password = $('#RegisterPassword').val()
+            const fullName = $('#RegisterFullName').val()
+            const address = $('#RegisterAddress').val()
+
+            if(!username || !password || !fullName || !address){
+                error.text("Please enter all fields")
+                return;
+            }
+
+            const newUser = {
+                username,
+                password,
+                fullName,
+                address,
+            }
+
+            $.post('http://localhost:3113/register', newUser).then(data => {
+                if(data.success){
+                    $(location).attr('href', '/login')
+                }
+                else{
+                    error.text(data.message)
+                    return;
+                }
+            })
+        });
+    });
+</script>

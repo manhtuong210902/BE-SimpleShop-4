@@ -1,0 +1,104 @@
+
+<div class="py-4">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="alert alert-light d-flex justify-content-between align-items-center" role="alert">
+                <p><b>Hi</b> {{user.Username}}</p> 
+                <div class="d-flex gap-3">
+                    <a href="/products/cart" class="position-relative" style="text-decoration: none;">
+                        <i class="bi bi-cart" style="font-size: 20px;"></i>
+                        <span class="num-cart position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0<span/>
+                    </a>
+                    <a href="http://localhost:3113/logout" class="btn btn-primary">Logout</a>
+                </div>
+            </div>
+        </div>
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-light">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-dark min-vh-100">
+                    <a href="/products/all" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-dark text-decoration-none border-bottom border-dark">
+                        <span class="fs-5 d-none d-sm-inline">Categories</span>
+                    </a>
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                        {{#each categories}}
+                            {{#if (isActive this.CategoryID this.id)}}
+                                <li class="nav-item">
+                                    <a href="/products/{{this.CategoryID}}" class="nav-link align-middle px-0 text-danger">
+                                        <span class="ms-1 d-none d-sm-inline">{{this.CategoryName}}</span>
+                                    </a>
+                                </li>
+                            {{else}}
+                                <li class="nav-item">
+                                    <a href="/products/{{this.CategoryID}}" class="nav-link align-middle px-0">
+                                        <span class="ms-1 d-none d-sm-inline">{{this.CategoryName}}</span>
+                                    </a>
+                                </li>
+                            {{/if}}
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+            <div class="col py-3">
+                <div class="container">
+                    <div class="row">
+                        {{#each products}}
+                        <div class="col col-sm-6 col-lg-4 mb-3">
+                            <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <p class="d-none id-pro">{{this.ProductID}}</p>
+                                    <p class="card-text"><b>Tên sản phẩm: </b>{{this.ProductName}}</p>
+                                    <p class="card-text"><b>Giá: </b>{{this.UnitPrice}}</p>
+                                    <button class="btn btn-primary btn-add">Thêm dỏ hàng</button>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sum(carts) {
+        let sum = 0;
+        for(let i = 0; i < carts.length; i++){
+            sum+=carts[i].qty;
+        }
+        return sum;
+    }
+
+    $(document).ready(function() {
+        let carts = [];
+        const num = $('.num-cart')
+        if(localStorage.getItem('carts')){
+            carts = JSON.parse(localStorage.getItem('carts'));
+            num.text("0")
+        }
+        num.text(sum(carts).toString())
+
+       $('.btn-add').click(function(e){
+            const id = $(this).closest('.card-body').find('.id-pro').text();
+            let check = true;
+            for(let i = 0; i < carts.length; i++){
+                if(id == carts[i].ProductID){
+                    carts[i].qty++;
+                    check = false;
+                }
+            }
+
+            if(check){
+                $.get(`http://localhost:20619/products/get/${id}`).then(data => {
+                    carts.push({ ...data.product, qty: 1})
+                    localStorage.setItem('carts', JSON.stringify(carts));
+                    num.text(sum(carts).toString())
+                })
+            }
+            else{
+                localStorage.setItem('carts', JSON.stringify(carts));
+                num.text(sum(carts).toString())
+            }
+       })
+    });
+</script>

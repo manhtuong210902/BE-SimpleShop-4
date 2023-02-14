@@ -1,0 +1,85 @@
+<div class="py-5">
+    <div class="alert alert-light d-flex justify-content-between align-items-center" role="alert">
+        <p><b>Hi</b> {{user.Username}}</p> 
+        <div class="d-flex gap-3">
+            <a href="/products/cart" class="position-relative" style="text-decoration: none;">
+                <i class="bi bi-cart" style="font-size: 20px;"></i>
+                <span class="num-cart position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0<span/>
+            </a>
+            <a href="http://localhost:3113/logout" class="btn btn-primary">Logout</a>
+        </div>
+    </div>
+    <p><b>Địa chỉ giao hàng: </b>{{user.Address}}</p>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ProductID</th>
+                <th scope="col">Tên món</th>
+                <th scope="col">Giá</th>
+                <th scope="col">Hành động</th>
+            </tr>
+        </thead>
+        <tbody class="cart-list">
+            
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        function sum(carts) {
+            let sum = 0;
+            for(let i = 0; i < carts.length; i++){
+                sum+=carts[i].qty;
+            }
+            return sum;
+        }
+
+        function render(carts){
+            const cartList = $('.cart-list')
+            cartList.text("")
+            for(let i = 0; i < carts.length; i++){
+                cartList.append(`
+                    <tr>
+                        <td>${carts[i].ProductID}</td>
+                        <td>${carts[i].ProductName}</td>
+                        <td>${carts[i].UnitPrice}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="d-none index">${i}</span>
+                                <span class="text-primary btn-sub-table"><i class="bi bi-dash-square"></i></span>
+                                <span>${carts[i].qty}</span>
+                                <span class="text-danger btn-add-table"><i class="bi bi-plus-square"></i></span>
+                            </div>
+                        </td>
+                    </tr>
+                `)
+            }
+        }
+
+        let carts = [];
+        const num = $('.num-cart')
+        if(localStorage.getItem('carts')){
+            carts = JSON.parse(localStorage.getItem('carts'));
+            num.text("0")
+        }
+        num.text(sum(carts).toString())
+       
+        render(carts)
+
+        $('.btn-sub-table').click(function(e){
+            const index = $(this).parent().find(".index").text();
+            carts[index].qty -= 1;
+            localStorage.setItem('carts', JSON.stringify(carts));
+            location.reload()
+        })
+
+
+        $('.btn-add-table').click(function(e){
+            const index = $(this).parent().find(".index").text();
+            carts[index].qty += 1;
+            localStorage.setItem('carts', JSON.stringify(carts));
+            location.reload()
+        })
+    });
+</script>
